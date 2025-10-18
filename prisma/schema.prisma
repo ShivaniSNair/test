@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  name         String
+  email        String    @unique
+  reg_no       String?
+  year         String?
+  domain       String?
+  ref_code     String    @unique
+  status       String    @default("pending") // pending | approved | rejected
+  passwordHash String?
+  role         String    @default("member") // member | admin
+  createdAt    DateTime  @default(now())
+  profile      Profile?
+}
+
+model Profile {
+  id         String       @id @default(uuid())
+  user       User         @relation(fields: [userId], references: [id])
+  userId     String       @unique
+  username   String       @unique
+  bio        String?
+  avatarUrl  String?
+  themeColor String?
+  createdAt  DateTime     @default(now())
+  socialLinks SocialLink[]
+}
+
+model SocialLink {
+  id         String   @id @default(uuid())
+  profile    Profile  @relation(fields: [profileId], references: [id])
+  profileId  String
+  platform   String
+  url        String
+}
